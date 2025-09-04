@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "navi": {
+      "command": "node",
+      "args": [
+        "/Users/juanpablodiaz/my_projects/NAVI/dist/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "NAVI_LOG_LEVEL": "info",
+        "NAVI_MAX_FILE_SIZE": "1048576",
+        "NAVI_MAX_DEPTH": "10"
+      }
+    }
+  }
+}

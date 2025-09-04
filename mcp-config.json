@@ -1,0 +1,168 @@
+{
+  "mcpServers": {
+    "navi": {
+      "command": "node",
+      "args": [
+        "/Users/juanpablodiaz/my_projects/NAVI/dist/index.js"
+      ],
+      "env": {
+        "NODE_ENV": "production",
+        "NAVI_LOG_LEVEL": "info",
+        "NAVI_MAX_FILE_SIZE": "1048576",
+        "NAVI_MAX_DEPTH": "10"
+      }
+    }
+  },
+  "tools": {
+    "generate-tree": {
+      "description": "Generate ASCII tree visualization of directory structure",
+      "examples": [
+        {
+          "description": "Basic directory tree",
+          "arguments": {
+            "path": "./src"
+          }
+        },
+        {
+          "description": "Tree with file sizes and limited depth",
+          "arguments": {
+            "path": "./src",
+            "maxDepth": 3,
+            "showSizes": true
+          }
+        },
+        {
+          "description": "Filter TypeScript files only",
+          "arguments": {
+            "path": "./src",
+            "extensions": ["ts", "tsx"]
+          }
+        }
+      ]
+    },
+    "analyze-dependencies": {
+      "description": "Analyze code dependencies and create dependency graph",
+      "status": "placeholder",
+      "implementationPhase": "Phase 3",
+      "examples": [
+        {
+          "description": "Basic dependency analysis",
+          "arguments": {
+            "path": "./src"
+          }
+        },
+        {
+          "description": "TypeScript/JavaScript dependency analysis",
+          "arguments": {
+            "path": "./src",
+            "languages": ["typescript", "javascript"],
+            "includeExternal": false
+          }
+        }
+      ]
+    },
+    "semantic-search": {
+      "description": "Perform intelligent semantic code search",
+      "status": "placeholder",
+      "implementationPhase": "Phase 4",
+      "examples": [
+        {
+          "description": "Search for authentication code",
+          "arguments": {
+            "query": "authentication middleware",
+            "path": "./src",
+            "searchType": "semantic"
+          }
+        },
+        {
+          "description": "Fuzzy search with context",
+          "arguments": {
+            "query": "auth",
+            "path": "./src",
+            "searchType": "fuzzy",
+            "includeContext": true,
+            "contextLines": 5
+          }
+        }
+      ]
+    },
+    "find-auth": {
+      "description": "Discover authentication logic and security implementations",
+      "status": "placeholder",
+      "implementationPhase": "Phase 5",
+      "examples": [
+        {
+          "description": "Find all authentication patterns",
+          "arguments": {
+            "path": "./src"
+          }
+        },
+        {
+          "description": "Find Express.js authentication",
+          "arguments": {
+            "path": "./src",
+            "frameworks": ["express"],
+            "minConfidence": 0.8
+          }
+        }
+      ]
+    },
+    "visualize-graph": {
+      "description": "Create visual representation of dependency graphs",
+      "status": "placeholder",
+      "implementationPhase": "Phase 3",
+      "examples": [
+        {
+          "description": "ASCII dependency graph",
+          "arguments": {
+            "dependencyData": "{}",
+            "format": "ascii",
+            "layout": "hierarchical"
+          }
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "maxFileSize": 1048576,
+    "excludePatterns": [
+      "node_modules",
+      ".git",
+      "dist",
+      "build",
+      ".next",
+      ".nuxt",
+      "coverage",
+      ".nyc_output"
+    ],
+    "supportedLanguages": [
+      "javascript",
+      "typescript",
+      "python",
+      "go",
+      "java",
+      "rust",
+      "cpp",
+      "csharp",
+      "php",
+      "ruby",
+      "swift",
+      "kotlin",
+      "scala"
+    ]
+  },
+  "installation": {
+    "requirements": {
+      "node": ">=18.0.0",
+      "npm": ">=8.0.0"
+    },
+    "setup": [
+      "npm install",
+      "npm run build"
+    ],
+    "test": [
+      "npm test",
+      "npm run test:mcp"
+    ]
+  }
+}
