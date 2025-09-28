@@ -25,6 +25,15 @@ export async function registerTools(config: NaviConfig): Promise<Map<string, Nav
   const { FindFilesTool } = await import('./find-files.js');
   const { CompareProjectsTool } = await import('./compare-projects.js');
 
+  // New navigation tools
+  const { FindFunctionTool } = await import('./find-function.js');
+  const { TraceCallChainTool } = await import('./trace-call-chain.js');
+  const { SearchByPatternTool } = await import('./search-by-pattern.js');
+  const { GetFunctionContextTool } = await import('./get-function-context.js');
+  const { FindImplementationsTool } = await import('./find-implementations.js');
+  const { AnalyzeImportsTool } = await import('./analyze-imports.js');
+  const { FindFunctionCallsTool } = await import('./find-function-calls.js');
+
   // Register all available tools
   tools.set('generate-tree', new GenerateTreeTool(config));
   tools.set('analyze-dependencies', new AnalyzeDependenciesTool(config));
@@ -34,6 +43,15 @@ export async function registerTools(config: NaviConfig): Promise<Map<string, Nav
   tools.set('analyze-codebase', new AnalyzeCodebaseTool(config));
   tools.set('find-files', new FindFilesTool(config));
   tools.set('compare-projects', new CompareProjectsTool(config));
+
+  // Register new navigation tools
+  tools.set('find-function', new FindFunctionTool(config));
+  tools.set('trace-call-chain', new TraceCallChainTool(config));
+  tools.set('search-by-pattern', new SearchByPatternTool(config));
+  tools.set('get-function-context', new GetFunctionContextTool(config));
+  tools.set('find-implementations', new FindImplementationsTool(config));
+  tools.set('analyze-imports', new AnalyzeImportsTool(config));
+  tools.set('find-function-calls', new FindFunctionCallsTool(config));
 
   return tools;
 }

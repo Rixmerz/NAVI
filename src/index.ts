@@ -202,6 +202,101 @@ class NaviMCPServer {
               },
               required: ['pathA', 'pathB']
             }
+          },
+          {
+            name: 'find-function',
+            description: 'Find function definitions by name, return exact location, code, and references across the codebase',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                functionName: { type: 'string', description: 'Name of the function to find' },
+                path: { type: 'string', description: 'Root path to search in' },
+                languages: { type: 'array', items: { type: 'string' }, description: 'Programming languages to search' },
+                includeReferences: { type: 'boolean', description: 'Include function references/calls', default: true },
+                exactMatch: { type: 'boolean', description: 'Require exact name match', default: false },
+                maxResults: { type: 'number', description: 'Maximum number of results', default: 50 }
+              },
+              required: ['functionName', 'path']
+            }
+          },
+          {
+            name: 'trace-call-chain',
+            description: 'Trace function call chains to show who calls whom in the codebase',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                functionName: { type: 'string', description: 'Name of the function to trace' },
+                path: { type: 'string', description: 'Root path to search in' },
+                direction: { type: 'string', enum: ['callers', 'callees', 'both'], description: 'Direction to trace', default: 'both' },
+                maxDepth: { type: 'number', description: 'Maximum depth to trace', default: 5 },
+                languages: { type: 'array', items: { type: 'string' }, description: 'Programming languages to analyze' },
+                includeExternal: { type: 'boolean', description: 'Include external library calls', default: false }
+              },
+              required: ['functionName', 'path']
+            }
+          },
+          {
+            name: 'search-by-pattern',
+            description: 'Advanced pattern search tool with regex support and scope filtering',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                pattern: { type: 'string', description: 'Regex pattern to search for' },
+                path: { type: 'string', description: 'Root path to search in' },
+                scope: { type: 'string', enum: ['functions', 'classes', 'variables', 'imports', 'all'], description: 'Scope to search within', default: 'all' },
+                languages: { type: 'array', items: { type: 'string' }, description: 'Programming languages to search' },
+                caseSensitive: { type: 'boolean', description: 'Case sensitive pattern matching', default: true },
+                maxResults: { type: 'number', description: 'Maximum number of results', default: 100 },
+                includeContext: { type: 'boolean', description: 'Include surrounding context', default: true }
+              },
+              required: ['pattern', 'path']
+            }
+          },
+          {
+            name: 'get-function-context',
+            description: 'Find the containing class/module context for a given function',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                functionName: { type: 'string', description: 'Name of the function to get context for' },
+                path: { type: 'string', description: 'Root path to search in' },
+                languages: { type: 'array', items: { type: 'string' }, description: 'Programming languages to search' },
+                includeParentClass: { type: 'boolean', description: 'Include parent class information', default: true },
+                includeModule: { type: 'boolean', description: 'Include module/file information', default: true },
+                includeDocumentation: { type: 'boolean', description: 'Include function documentation', default: true }
+              },
+              required: ['functionName', 'path']
+            }
+          },
+          {
+            name: 'find-implementations',
+            description: 'Find all implementations of an interface or abstract class',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                interfaceName: { type: 'string', description: 'Name of the interface or abstract class' },
+                path: { type: 'string', description: 'Root path to search in' },
+                languages: { type: 'array', items: { type: 'string' }, description: 'Programming languages to search' },
+                includeAbstract: { type: 'boolean', description: 'Include abstract implementations', default: true },
+                maxResults: { type: 'number', description: 'Maximum number of results', default: 50 }
+              },
+              required: ['interfaceName', 'path']
+            }
+          },
+          {
+            name: 'analyze-imports',
+            description: 'Analyze import dependencies for a specific file',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                filePath: { type: 'string', description: 'Path to the file to analyze imports for' },
+                includeExternal: { type: 'boolean', description: 'Include external library imports', default: true },
+                includeInternal: { type: 'boolean', description: 'Include internal project imports', default: true },
+                resolveTypes: { type: 'boolean', description: 'Resolve import types and usage', default: false },
+                showUnused: { type: 'boolean', description: 'Show potentially unused imports', default: false }
+              },
+              required: ['filePath']
+            }
           }
         ]
       };

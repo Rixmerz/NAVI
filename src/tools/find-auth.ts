@@ -143,7 +143,7 @@ export class FindAuthTool extends BaseNaviTool {
         confidence: 0.9
       },
 
-      // Express.js Middleware
+      // Express.js Middleware (Expanded)
       {
         name: 'Express Auth Middleware',
         category: 'Middleware',
@@ -153,10 +153,71 @@ export class FindAuthTool extends BaseNaviTool {
           /router\.use.*auth/i,
           /middleware.*auth/i,
           /authenticate.*middleware/i,
-          /isAuthenticated/i
+          /isAuthenticated/i,
+          /requireAuth/i,
+          /checkAuth/i,
+          /verifyToken/i,
+          /ensureAuthenticated/i,
+          /protect.*route/i,
+          /auth.*guard/i,
+          /function.*auth.*\(/i,
+          /const.*auth.*=.*\(/i,
+          /export.*auth/i
         ],
-        keywords: ['middleware', 'authenticate', 'authorize'],
+        keywords: ['middleware', 'authenticate', 'authorize', 'requireAuth', 'checkAuth', 'guard'],
         confidence: 0.8
+      },
+
+      // Express-Validator Patterns (Enhanced)
+      {
+        name: 'Express Validator Auth',
+        category: 'Validation',
+        framework: 'express',
+        patterns: [
+          /express-validator/i,
+          /require\s*\(\s*['"`]express-validator['"`]/i,
+          /import.*express-validator/i,
+          /from\s*['"`]express-validator['"`]/i,
+          /check\s*\(/i,
+          /body\s*\(/i,
+          /param\s*\(/i,
+          /query\s*\(/i,
+          /header\s*\(/i,
+          /cookie\s*\(/i,
+          /validationResult/i,
+          /check.*isEmail/i,
+          /check.*isLength/i,
+          /check.*isAlphanumeric/i,
+          /check.*matches/i,
+          /sanitize.*email/i,
+          /sanitize.*escape/i,
+          /custom.*validator/i,
+          /withMessage/i
+        ],
+        keywords: ['express-validator', 'check', 'body', 'validationResult', 'sanitize'],
+        confidence: 0.6
+      },
+
+      // Custom Auth Middleware Patterns
+      {
+        name: 'Custom Auth Middleware',
+        category: 'Custom',
+        patterns: [
+          /function.*\(req,\s*res,\s*next\).*auth/i,
+          /\(req,\s*res,\s*next\)\s*=>/i,
+          /req\.headers\.authorization/i,
+          /req\.header\s*\(\s*['"`]authorization/i,
+          /req\.get\s*\(\s*['"`]authorization/i,
+          /Bearer\s*\+/i,
+          /token\s*=.*req\./i,
+          /if\s*\(\s*!.*token/i,
+          /return.*res\.status\(401\)/i,
+          /return.*res\.status\(403\)/i,
+          /next\(\s*new\s*Error/i,
+          /throw.*new.*Error.*auth/i
+        ],
+        keywords: ['req', 'res', 'next', 'authorization', 'Bearer', 'token', '401', '403'],
+        confidence: 0.9
       },
 
       // API Key Authentication
@@ -174,19 +235,143 @@ export class FindAuthTool extends BaseNaviTool {
         confidence: 0.75
       },
 
-      // CORS and Security Headers
+      // CORS and Security Headers (Enhanced)
       {
         name: 'CORS and Security',
         category: 'Security',
         patterns: [
           /cors\s*\(/i,
           /helmet\s*\(/i,
+          /app\.use\s*\(\s*cors/i,
+          /app\.use\s*\(\s*helmet/i,
+          /require\s*\(\s*['"`]cors['"`]/i,
+          /require\s*\(\s*['"`]helmet['"`]/i,
+          /import.*cors/i,
+          /import.*helmet/i,
+          /from\s*['"`]cors['"`]/i,
+          /from\s*['"`]helmet['"`]/i,
           /access-control/i,
           /x-frame-options/i,
           /content-security-policy/i
         ],
         keywords: ['cors', 'helmet', 'csp', 'security'],
-        confidence: 0.7
+        confidence: 0.6
+      },
+
+      // Modern Auth Libraries
+      {
+        name: 'Modern Auth Libraries',
+        category: 'Modern',
+        patterns: [
+          /next-auth/i,
+          /auth0/i,
+          /firebase.*auth/i,
+          /supabase.*auth/i,
+          /clerk/i,
+          /lucia-auth/i,
+          /iron-session/i,
+          /jose/i,
+          /@auth\/core/i,
+          /next.*middleware/i
+        ],
+        keywords: ['next-auth', 'auth0', 'firebase', 'supabase', 'clerk', 'lucia', 'jose'],
+        confidence: 0.95
+      },
+
+      // Database Auth Patterns
+      {
+        name: 'Database Auth Patterns',
+        category: 'Database',
+        patterns: [
+          /User\.findOne/i,
+          /User\.findByEmail/i,
+          /User\.create/i,
+          /findUserBy/i,
+          /getUserBy/i,
+          /createUser/i,
+          /updateUser/i,
+          /deleteUser/i,
+          /user.*model/i,
+          /auth.*schema/i,
+          /user.*schema/i
+        ],
+        keywords: ['User', 'findOne', 'findByEmail', 'createUser', 'schema', 'model'],
+        confidence: 0.75
+      },
+
+      // Route Protection Patterns
+      {
+        name: 'Route Protection',
+        category: 'Routes',
+        patterns: [
+          /protected.*route/i,
+          /private.*route/i,
+          /authenticated.*route/i,
+          /withAuth/i,
+          /requiresAuth/i,
+          /ProtectedRoute/i,
+          /AuthGuard/i,
+          /canActivate/i,
+          /guards.*auth/i,
+          /route.*middleware.*auth/i
+        ],
+        keywords: ['protected', 'private', 'withAuth', 'requiresAuth', 'AuthGuard', 'canActivate'],
+        confidence: 0.85
+      },
+
+      // Cookie and Storage Auth
+      {
+        name: 'Cookie and Storage Auth',
+        category: 'Storage',
+        patterns: [
+          /httpOnly.*cookie/i,
+          /secure.*cookie/i,
+          /sameSite.*cookie/i,
+          /localStorage.*token/i,
+          /sessionStorage.*token/i,
+          /document\.cookie/i,
+          /cookie.*parser/i,
+          /signed.*cookie/i,
+          /refresh.*token/i,
+          /access.*token/i
+        ],
+        keywords: ['httpOnly', 'secure', 'sameSite', 'localStorage', 'sessionStorage', 'refreshToken'],
+        confidence: 0.8
+      },
+
+      // Two-Factor Authentication
+      {
+        name: 'Two-Factor Authentication',
+        category: '2FA',
+        patterns: [
+          /two.*factor/i,
+          /2fa/i,
+          /totp/i,
+          /authenticator/i,
+          /speakeasy/i,
+          /qrcode/i,
+          /otpauth/i,
+          /google.*authenticator/i,
+          /backup.*codes/i,
+          /recovery.*codes/i
+        ],
+        keywords: ['2fa', 'totp', 'authenticator', 'speakeasy', 'qrcode', 'backup'],
+        confidence: 0.9
+      },
+
+      // Basic Security Imports (High Detection)
+      {
+        name: 'Security Package Imports',
+        category: 'Imports',
+        patterns: [
+          /require\s*\(\s*['"`](cors|helmet|express-validator|bcrypt|jsonwebtoken|passport)['"`]/i,
+          /import.*from\s*['"`](cors|helmet|express-validator|bcrypt|jsonwebtoken|passport)['"`]/i,
+          /import\s*\*.*from\s*['"`](cors|helmet|express-validator|bcrypt|jsonwebtoken|passport)['"`]/i,
+          /import\s*{.*}\s*from\s*['"`](cors|helmet|express-validator|bcrypt|jsonwebtoken|passport)['"`]/i,
+          /const.*=.*require\s*\(\s*['"`](cors|helmet|express-validator|bcrypt|jsonwebtoken|passport)['"`]/i
+        ],
+        keywords: ['require', 'import', 'cors', 'helmet', 'express-validator', 'bcrypt', 'jsonwebtoken', 'passport'],
+        confidence: 0.95
       }
     ];
   }
@@ -205,7 +390,8 @@ export class FindAuthTool extends BaseNaviTool {
 
     // Get all files to analyze
     const allFiles = await this.fileSystemHelper.getAllFiles(input.path, {
-      extensions: ['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'java', 'cs', 'php', 'rb']
+      extensions: ['ts', 'tsx', 'js', 'jsx', 'py', 'go', 'java', 'cs', 'php', 'rb'],
+      excludePatterns: this.config.excludePatterns
     });
 
     // Filter out test files if not included

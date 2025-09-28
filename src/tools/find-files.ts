@@ -2,6 +2,7 @@ import { BaseNaviTool } from './index.js';
 import { z } from 'zod';
 import { FileSystemHelper } from '../utils/file-system.js';
 import { detectLanguage } from '../utils/language-detection.js';
+import { ChunkingHelper } from '../utils/chunking-helper.js';
 
 const FindFilesSchema = z.object({
   path: z.string().describe('Root path to search in'),
@@ -50,17 +51,45 @@ export class FindFilesTool extends BaseNaviTool {
       }
 
       const matches = await this.findFiles(input);
-      const report = this.generateReport(matches, input);
-      
+
+      // Apply auto-chunking for large result sets
+      const chunks = ChunkingHelper.smartChunk(
+        matches,
+        {
+          maxTokens: 20000,
+          maxResults: input.maxResults || 100,
+          prioritizeRecent: false
+        },
+        (match) => `${match.path} ${match.size} ${match.matches?.map(m => m.content).join(' ') || ''}`
+      );
+
+      const firstChunk = chunks[0];
+      if (!firstChunk) {
+        return this.generateReport([], input);
+      }
+
+      const report = this.generateReport(firstChunk.data, input);
+
+      // Add chunking info if results were chunked
+      const chunkInfo = chunks.length > 1 ?
+        ChunkingHelper.createChunkSummary(chunks, 'files') +
+        ChunkingHelper.formatChunkInfo(firstChunk) : '';
+
+      const finalReport = report + chunkInfo;
+
       const metadata = {
         searchPath: input.path,
-        totalMatches: matches.length,
+        totalMatches: firstChunk.totalItems,
+        displayedMatches: firstChunk.data.length,
         pattern: input.pattern,
         contentSearch: !!input.content,
+        chunked: chunks.length > 1,
+        totalChunks: chunks.length,
+        estimatedTokens: firstChunk.estimatedTokens,
         timestamp: new Date().toISOString()
       };
 
-      return this.formatResult(report, metadata);
+      return this.formatResult(finalReport, metadata);
     } catch (error) {
       throw new Error(this.formatError(error, 'File search failed'));
     }
@@ -76,8 +105,14 @@ export class FindFilesTool extends BaseNaviTool {
       options.extensions = input.extensions;
     }
 
-    if (input.excludePatterns) {
-      options.excludePatterns = input.excludePatterns;
+    // Combine default excludePatterns with user-provided ones
+    const excludePatterns = [
+      ...this.config.excludePatterns,
+      ...(input.excludePatterns || [])
+    ];
+
+    if (excludePatterns.length > 0) {
+      options.excludePatterns = excludePatterns;
     }
 
     const allFiles = await this.fileSystemHelper.getAllFiles(input.path, options);

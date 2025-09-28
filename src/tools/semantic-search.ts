@@ -3,6 +3,7 @@ import { SemanticSearchSchema } from '../types/index.js';
 import type { SemanticSearchInput } from '../types/index.js';
 import { FileSystemHelper } from '../utils/file-system.js';
 import { detectLanguage } from '../utils/language-detection.js';
+import { ChunkingHelper } from '../utils/chunking-helper.js';
 import { promises as fs } from 'fs';
 import { relative } from 'path';
 
@@ -50,18 +51,54 @@ export class SemanticSearchTool extends BaseNaviTool {
       const searchTime = Date.now() - startTime;
 
       result.searchTime = searchTime;
-      const report = this.generateReport(result, input);
+
+      // Apply auto-chunking if results are too large
+      const chunks = ChunkingHelper.smartChunk(
+        result.matches,
+        {
+          maxTokens: 20000,
+          maxResults: input.maxResults || 100,
+          prioritizeRecent: false
+        },
+        (match) => `${match.file}:${match.line} ${match.content} ${match.context.join(' ')}`
+      );
+
+      // Use first chunk for the response
+      const firstChunk = chunks[0];
+      if (!firstChunk) {
+        return this.generateReport(result, input);
+      }
+
+      // Update result with chunked data
+      const chunkedResult = {
+        ...result,
+        matches: firstChunk.data,
+        totalMatches: firstChunk.totalItems
+      };
+
+      const report = this.generateReport(chunkedResult, input);
+
+      // Add chunking info if results were chunked
+      const chunkInfo = chunks.length > 1 ?
+        ChunkingHelper.createChunkSummary(chunks, 'matches') +
+        ChunkingHelper.formatChunkInfo(firstChunk) : '';
+
+      const finalReport = report + chunkInfo;
 
       const metadata = {
         query: input.query,
         searchType: input.searchType,
-        totalMatches: result.totalMatches,
+        totalMatches: firstChunk.totalItems,
+        displayedMatches: firstChunk.data.length,
         totalFiles: result.totalFiles,
         searchTime: `${searchTime}ms`,
+        chunked: chunks.length > 1,
+        totalChunks: chunks.length,
+        estimatedTokens: firstChunk.estimatedTokens,
         timestamp: new Date().toISOString()
       };
 
-      return this.formatResult(report, metadata);
+      return this.formatResult(finalReport, metadata);
     } catch (error) {
       throw new Error(this.formatError(error, 'Semantic search failed'));
     }
@@ -78,7 +115,8 @@ export class SemanticSearchTool extends BaseNaviTool {
 
     // Get all files to search
     const allFiles = await this.fileSystemHelper.getAllFiles(input.path, {
-      extensions: this.getSupportedExtensions(input.languages)
+      extensions: this.getSupportedExtensions(input.languages),
+      excludePatterns: this.config.excludePatterns
     });
 
     // Filter files by language if specified

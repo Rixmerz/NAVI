@@ -86,7 +86,8 @@ export class AnalyzeDependenciesTool extends BaseNaviTool {
 
     // Get all files to analyze
     const allFiles = await this.fileSystemHelper.getAllFiles(input.path, {
-      extensions: this.getSupportedExtensions(input.languages)
+      extensions: this.getSupportedExtensions(input.languages),
+      excludePatterns: this.config.excludePatterns
     });
 
     // Filter files by language if specified

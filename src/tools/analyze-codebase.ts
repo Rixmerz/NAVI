@@ -2,6 +2,7 @@ import { BaseNaviTool } from './index.js';
 import { z } from 'zod';
 import { FileSystemHelper } from '../utils/file-system.js';
 import { detectLanguage } from '../utils/language-detection.js';
+import { ChunkingHelper } from '../utils/chunking-helper.js';
 
 const AnalyzeCodebaseSchema = z.object({
   path: z.string().describe('Root path to analyze'),
@@ -51,17 +52,39 @@ export class AnalyzeCodebaseTool extends BaseNaviTool {
       }
 
       const stats = await this.analyzeCodebase(input);
-      const report = this.generateReport(stats, input.detailed);
-      
+
+      // Check if we need to chunk large file lists
+      let chunkedStats = stats;
+      let chunkInfo = '';
+
+      if (input.detailed && stats.largestFiles.length > 20) {
+        const chunks = ChunkingHelper.chunkByCount(stats.largestFiles, 20);
+        const firstChunk = chunks[0];
+
+        if (firstChunk && chunks.length > 1) {
+          chunkedStats = {
+            ...stats,
+            largestFiles: firstChunk.data
+          };
+          chunkInfo = ChunkingHelper.createChunkSummary(chunks, 'files') +
+                     ChunkingHelper.formatChunkInfo(firstChunk);
+        }
+      }
+
+      const report = this.generateReport(chunkedStats, input.detailed);
+      const finalReport = report + chunkInfo;
+
       const metadata = {
         analyzedPath: input.path,
         timestamp: new Date().toISOString(),
         totalFiles: stats.totalFiles,
+        displayedFiles: chunkedStats.largestFiles.length,
         totalSize: this.formatFileSize(stats.totalSize),
-        languages: Object.keys(stats.languageStats).length
+        languages: Object.keys(stats.languageStats).length,
+        chunked: chunkInfo.length > 0
       };
 
-      return this.formatResult(report, metadata);
+      return this.formatResult(finalReport, metadata);
     } catch (error) {
       throw new Error(this.formatError(error, 'Codebase analysis failed'));
     }
@@ -110,8 +133,14 @@ export class AnalyzeCodebaseTool extends BaseNaviTool {
       includeHidden: input.includeHidden
     };
 
-    if (input.excludePatterns) {
-      options.excludePatterns = input.excludePatterns;
+    // Combine default excludePatterns with user-provided ones
+    const excludePatterns = [
+      ...this.config.excludePatterns,
+      ...(input.excludePatterns || [])
+    ];
+
+    if (excludePatterns.length > 0) {
+      options.excludePatterns = excludePatterns;
     }
 
     const entries = await this.fileSystemHelper.listDirectory(dirPath, options);
